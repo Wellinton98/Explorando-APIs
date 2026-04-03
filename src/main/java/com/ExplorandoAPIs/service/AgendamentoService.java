@@ -7,6 +7,7 @@ import com.ExplorandoAPIs.repository.AgendamentoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class AgendamentoService {
         validarAgendamento(agendamento);
 
         agendamento.setStatus(StatusAgendamento.AGENDADO);
+        agendamento.setCriadoEm(LocalDateTime.now());
+        agendamento.setAtualizadoEm(LocalDateTime.now());
 
         return repository.save(agendamento);
     }
@@ -45,9 +48,14 @@ public class AgendamentoService {
 
         existente.setData(novo.getData());
         existente.setHorario(novo.getHorario());
-        existente.setClienteId(novo.getClienteId());
-        existente.setServicoId(novo.getServicoId());
+        existente.setClienteNome(novo.getClienteNome());
+        existente.setClienteTelefone(novo.getClienteTelefone());
+        existente.setServicoNome(novo.getServicoNome());
+        existente.setProfissionalNome(novo.getProfissionalNome());
         existente.setObservacao(novo.getObservacao());
+        existente.setValorServico(novo.getValorServico());
+
+        existente.setAtualizadoEm(LocalDateTime.now());
 
         return repository.save(existente);
     }
@@ -65,6 +73,7 @@ public class AgendamentoService {
         }
 
         agendamento.setStatus(StatusAgendamento.CANCELADO);
+        agendamento.setAtualizadoEm(LocalDateTime.now());
 
         return repository.save(agendamento);
     }
@@ -85,8 +94,10 @@ public class AgendamentoService {
 
         if (agendamento.getData() == null ||
             agendamento.getHorario() == null ||
-            agendamento.getClienteId() == null ||
-            agendamento.getServicoId() == null) {
+            agendamento.getClienteNome() == null ||
+            agendamento.getClienteTelefone() == null ||
+            agendamento.getServicoNome() == null ||
+            agendamento.getProfissionalNome() == null) {
 
             throw new AgendamentoException("Campos obrigatórios não preenchidos");
         }
