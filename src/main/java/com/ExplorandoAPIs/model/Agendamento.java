@@ -2,53 +2,40 @@ package com.ExplorandoAPIs.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Entity // Define que é uma entidade do banco
-@Table(name = "agendamentos") // Nome da tabela
+@Entity
 public class Agendamento {
 
-    @Id // Chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto incremento
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDate data; // Data do agendamento
+    private LocalDate data;
 
-    @Column(nullable = false)
-    private LocalTime horario; // Horário do agendamento
+    private LocalTime horario;
 
-    @Column(nullable = false)
-    private Long clienteId; // ID da API de Clientes
+    private String clienteNome;
 
-    @Column(nullable = false)
-    private Long servicoId; // ID da API de Serviços
+    private String clienteTelefone;
 
-    @Enumerated(EnumType.STRING) // Salva o enum como texto
-    @Column(nullable = false)
-    private StatusAgendamento status; // Status do agendamento
+    private String servicoNome;
 
-    @Column(length = 200)
-    private String observacao; // Campo opcional
+    private String profissionalNome;
 
-    // Construtor vazio (obrigatório para o JPA)
-    public Agendamento() {
-    }
+    private String observacao;
 
-    // Construtor completo
-    public Agendamento(Long id, LocalDate data, LocalTime horario,
-                        Long clienteId, Long servicoId,
-                        StatusAgendamento status, String observacao) {
-        this.id = id;
-        this.data = data;
-        this.horario = horario;
-        this.clienteId = clienteId;
-        this.servicoId = servicoId;
-        this.status = status;
-        this.observacao = observacao;
-    }
+    private Double valorServico;
 
-    // Getters e Setters
+    @Enumerated(EnumType.STRING)
+    private StatusAgendamento status;
+
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
+
+    // GETTERS E SETTERS
 
     public Long getId() {
         return id;
@@ -74,20 +61,52 @@ public class Agendamento {
         this.horario = horario;
     }
 
-    public Long getClienteId() {
-        return clienteId;
+    public String getClienteNome() {
+        return clienteNome;
     }
 
-    public void setClienteId(Long clienteId) {
-        this.clienteId = clienteId;
+    public void setClienteNome(String clienteNome) {
+        this.clienteNome = clienteNome;
     }
 
-    public Long getServicoId() {
-        return servicoId;
+    public String getClienteTelefone() {
+        return clienteTelefone;
     }
 
-    public void setServicoId(Long servicoId) {
-        this.servicoId = servicoId;
+    public void setClienteTelefone(String clienteTelefone) {
+        this.clienteTelefone = clienteTelefone;
+    }
+
+    public String getServicoNome() {
+        return servicoNome;
+    }
+
+    public void setServicoNome(String servicoNome) {
+        this.servicoNome = servicoNome;
+    }
+
+    public String getProfissionalNome() {
+        return profissionalNome;
+    }
+
+    public void setProfissionalNome(String profissionalNome) {
+        this.profissionalNome = profissionalNome;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
+    public Double getValorServico() {
+        return valorServico;
+    }
+
+    public void setValorServico(Double valorServico) {
+        this.valorServico = valorServico;
     }
 
     public StatusAgendamento getStatus() {
@@ -98,11 +117,19 @@ public class Agendamento {
         this.status = status;
     }
 
-    public String getObservacao() {
-        return observacao;
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
     }
 
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
+    }
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
+
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
     }
 }
