@@ -17,22 +17,24 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> erro = new HashMap<>();
 
-        erro.put("erro", ex.getMessage());
         erro.put("timestamp", LocalDateTime.now());
+        erro.put("erro", "Erro de regra de negócio");
+        erro.put("mensagem", ex.getMessage());
         erro.put("status", HttpStatus.BAD_REQUEST.value());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
 
         Map<String, Object> erro = new HashMap<>();
 
-        erro.put("erro", ex.getMessage());
         erro.put("timestamp", LocalDateTime.now());
-        erro.put("status", HttpStatus.BAD_REQUEST.value());
+        erro.put("erro", "Erro interno do servidor");
+        erro.put("mensagem", "Ocorreu um erro inesperado. Verifique os logs.");
+        erro.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
     }
 }
