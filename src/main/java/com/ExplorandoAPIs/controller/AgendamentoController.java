@@ -3,9 +3,7 @@ package com.ExplorandoAPIs.controller;
 import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
 import com.ExplorandoAPIs.dto.AgendamentoResponseDTO;
 import com.ExplorandoAPIs.model.Agendamento;
-import com.ExplorandoAPIs.model.StatusAgendamento;
 import com.ExplorandoAPIs.service.AgendamentoService;
-
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +21,8 @@ public class AgendamentoController {
         this.service = service;
     }
 
-    // Converter Entity para ResponseDTO
-    private AgendamentoResponseDTO converterParaDTO(Agendamento agendamento) {
+    // Conversão Entity -> ResponseDTO
+    private AgendamentoResponseDTO toResponseDTO(Agendamento agendamento) {
         return new AgendamentoResponseDTO(
                 agendamento.getId(),
                 agendamento.getData(),
@@ -36,80 +34,70 @@ public class AgendamentoController {
         );
     }
 
-    // Converter DTO para Entity
-   private Agendamento converterParaEntity(AgendamentoRequestDTO dto) {
+    // Conversão RequestDTO -> Entity (somente mapeamento de dados)
+    private Agendamento toEntity(AgendamentoRequestDTO dto) {
 
-    //  Não aceita null ou vazio
-    if (dto.getStatus() == null || dto.getStatus().isBlank()) {
-        throw new RuntimeException("O status é obrigatório");
+        Agendamento agendamento = new Agendamento();
+
+        agendamento.setData(dto.getData());
+        agendamento.setHorario(dto.getHorario());
+        agendamento.setClienteId(dto.getClienteId());
+        agendamento.setServicoId(dto.getServicoId());
+        agendamento.setObservacao(dto.getObservacao());
+
+        return agendamento;
     }
 
-    StatusAgendamento statusConvertido;
-
-    try {
-        statusConvertido = StatusAgendamento.valueOf(dto.getStatus().toUpperCase());
-    } catch (Exception e) {
-        throw new RuntimeException("Status inválido. Use: AGENDADO, CANCELADO ou CONCLUIDO");
-    }
-
-    Agendamento agendamento = new Agendamento();
-    agendamento.setData(dto.getData());
-    agendamento.setHorario(dto.getHorario());
-    agendamento.setClienteId(dto.getClienteId());
-    agendamento.setServicoId(dto.getServicoId());
-    agendamento.setStatus(statusConvertido);
-    agendamento.setObservacao(dto.getObservacao());
-
-    return agendamento;
-}
-    // POST criar
+    // CREATE
     @PostMapping
-    public ResponseEntity<AgendamentoResponseDTO> criar(@Valid @RequestBody AgendamentoRequestDTO dto) {
+    public ResponseEntity<AgendamentoResponseDTO> criar(
+            @Valid @RequestBody AgendamentoRequestDTO dto) {
 
-        Agendamento agendamento = converterParaEntity(dto);
-        Agendamento salvo = service.criar(agendamento);
+        Agendamento agendamento = toEntity(dto);
+        Agendamento criado = service.criar(agendamento);
 
-        return ResponseEntity.ok(converterParaDTO(salvo));
+        return ResponseEntity.ok(toResponseDTO(criado));
     }
 
-    // GET listar todos
+    // READ ALL
     @GetMapping
     public ResponseEntity<List<AgendamentoResponseDTO>> listar() {
 
         List<AgendamentoResponseDTO> lista = service.listar()
                 .stream()
-                .map(this::converterParaDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(lista);
     }
 
-    // GET por ID
+    // READ BY ID
     @GetMapping("/{id}")
     public ResponseEntity<AgendamentoResponseDTO> buscarPorId(@PathVariable Long id) {
 
         Agendamento agendamento = service.buscarPorId(id);
-        return ResponseEntity.ok(converterParaDTO(agendamento));
+
+        return ResponseEntity.ok(toResponseDTO(agendamento));
     }
 
-    // PUT atualizar
+    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<AgendamentoResponseDTO> atualizar(
             @PathVariable Long id,
             @Valid @RequestBody AgendamentoRequestDTO dto) {
 
-        Agendamento novo = converterParaEntity(dto);
+        Agendamento novo = toEntity(dto);
         Agendamento atualizado = service.atualizar(id, novo);
 
-        return ResponseEntity.ok(converterParaDTO(atualizado));
+        return ResponseEntity.ok(toResponseDTO(atualizado));
     }
 
-    // DELETE excluir
+    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
 
         service.deletar(id);
+
         return ResponseEntity.noContent().build();
-    
     }
 }

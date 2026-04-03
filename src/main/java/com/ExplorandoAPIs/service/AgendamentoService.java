@@ -6,6 +6,7 @@ import com.ExplorandoAPIs.repository.AgendamentoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -17,96 +18,29 @@ public class AgendamentoService {
         this.repository = repository;
     }
 
-    // 🔹 Método auxiliar para tratar status (aceita minúsculo)
-    private StatusAgendamento converterStatus(String status) {
-        try {
-            return StatusAgendamento.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new RuntimeException("Status inválido. Use: AGENDADO, CANCELADO ou CONCLUIDO");
-        }
-    }
-
-    // 🔹 Criar agendamento
     public Agendamento criar(Agendamento agendamento) {
 
-        LocalDate hoje = LocalDate.now();
-        LocalDate limiteFuturo = hoje.plusYears(1);
+        validarAgendamento(agendamento);
 
-        //  Nulls
-        if (agendamento.getData() == null || agendamento.getHorario() == null ||
-            agendamento.getClienteId() == null || agendamento.getServicoId() == null) {
-            throw new RuntimeException("Campos obrigatórios não preenchidos");
-        }
-
-        //  Data passada
-        if (agendamento.getData().isBefore(hoje)) {
-            throw new RuntimeException("Não é permitido agendar no passado");
-        }
-
-        //  Data muito no futuro
-        if (agendamento.getData().isAfter(limiteFuturo)) {
-            throw new RuntimeException("Agendamento permitido até 1 ano no futuro");
-        }
-
-        //  Horário inválido
-        if (agendamento.getHorario().isBefore(java.time.LocalTime.of(8, 0)) ||
-            agendamento.getHorario().isAfter(java.time.LocalTime.of(20, 0))) {
-            throw new RuntimeException("Horário fora do funcionamento (08:00 às 20:00)");
-        }
-
-        //  Horário duplicado
-        repository.findByDataAndHorario(agendamento.getData(), agendamento.getHorario())
-                .ifPresent(a -> {
-                    throw new RuntimeException("Horário já está ocupado");
-                });
-
-        //  Se vier status, converte (aceita minúsculo)
-        if (agendamento.getStatus() != null) {
-            agendamento.setStatus(
-                converterStatus(agendamento.getStatus().name())
-            );
-        } else {
-            agendamento.setStatus(StatusAgendamento.AGENDADO);
-        }
+        agendamento.setStatus(StatusAgendamento.AGENDADO);
 
         return repository.save(agendamento);
     }
 
-    // 🔹 Listar
     public List<Agendamento> listar() {
         return repository.findAll();
     }
 
-    // 🔹 Buscar por ID
     public Agendamento buscarPorId(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
     }
 
-    // 🔹 Atualizar
     public Agendamento atualizar(Long id, Agendamento novo) {
 
         Agendamento existente = buscarPorId(id);
 
-        LocalDate hoje = LocalDate.now();
-        LocalDate limiteFuturo = hoje.plusYears(1);
-
-        //  Data inválida
-        if (novo.getData().isBefore(hoje)) {
-            throw new RuntimeException("Não pode atualizar para data passada");
-        }
-
-        if (novo.getData().isAfter(limiteFuturo)) {
-            throw new RuntimeException("Data muito distante");
-        }
-
-        //  Horário duplicado
-        repository.findByDataAndHorario(novo.getData(), novo.getHorario())
-                .ifPresent(a -> {
-                    if (!a.getId().equals(id)) {
-                        throw new RuntimeException("Horário já ocupado");
-                    }
-                });
+        validarAgendamento(novo);
 
         existente.setData(novo.getData());
         existente.setHorario(novo.getHorario());
@@ -114,13 +48,9 @@ public class AgendamentoService {
         existente.setServicoId(novo.getServicoId());
         existente.setObservacao(novo.getObservacao());
 
-    
-
         return repository.save(existente);
-
     }
 
-    // 🔹 Cancelar
     public Agendamento cancelar(Long id) {
 
         Agendamento agendamento = buscarPorId(id);
@@ -138,7 +68,6 @@ public class AgendamentoService {
         return repository.save(agendamento);
     }
 
-    // 🔹 Deletar
     public void deletar(Long id) {
 
         if (!repository.existsById(id)) {
@@ -147,5 +76,35 @@ public class AgendamentoService {
 
         repository.deleteById(id);
     }
-    
+
+    private void validarAgendamento(Agendamento agendamento) {
+
+        LocalDate hoje = LocalDate.now();
+        LocalDate limiteFuturo = hoje.plusYears(1);
+
+        if (agendamento.getData() == null ||
+            agendamento.getHorario() == null ||
+            agendamento.getClienteId() == null ||
+            agendamento.getServicoId() == null) {
+            throw new RuntimeException("Campos obrigatórios não preenchidos");
+        }
+
+        if (agendamento.getData().isBefore(hoje)) {
+            throw new RuntimeException("Não é permitido agendar no passado");
+        }
+
+        if (agendamento.getData().isAfter(limiteFuturo)) {
+            throw new RuntimeException("Agendamento permitido até 1 ano no futuro");
+        }
+
+        if (agendamento.getHorario().isBefore(LocalTime.of(8, 0)) ||
+            agendamento.getHorario().isAfter(LocalTime.of(20, 0))) {
+            throw new RuntimeException("Horário fora do funcionamento (08:00 às 20:00)");
+        }
+
+        repository.findByDataAndHorario(agendamento.getData(), agendamento.getHorario())
+                .ifPresent(a -> {
+                    throw new RuntimeException("Horário já está ocupado");
+                });
+    }
 }
