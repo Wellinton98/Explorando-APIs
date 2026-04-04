@@ -6,26 +6,31 @@ import java.time.LocalTime;
 
 public class AgendamentoRequestDTO {
 
-    @NotNull(message = "A data é obrigatória")
+    @NotNull(message = "Data é obrigatória")
     private LocalDate data;
 
-    @NotNull(message = "O horário é obrigatório")
+    @NotNull(message = "Horário é obrigatório")
     private LocalTime horario;
 
-    @NotNull(message = "O clienteId é obrigatório")
-    private Long clienteId;
+    @NotBlank(message = "Nome do cliente é obrigatório")
+    private String clienteNome;
 
-    @NotNull(message = "O servicoId é obrigatório")
-    private Long servicoId;
+    @NotBlank(message = "Telefone do cliente é obrigatório")
+    private String clienteTelefone;
 
-    // 🔥 Aqui usamos String (não enum)
-    @NotBlank(message = "O status é obrigatório")
-    private String status;
+    @NotBlank(message = "Nome do serviço é obrigatório")
+    private String servicoNome;
 
-    @Size(max = 200, message = "Observação deve ter no máximo 200 caracteres")
+    @NotBlank(message = "Nome do profissional é obrigatório")
+    private String profissionalNome;
+
     private String observacao;
 
-    // Getters e Setters
+    @NotNull(message = "Valor do serviço é obrigatório")
+    @Positive(message = "Valor deve ser maior que zero")
+    private Double valorServico;
+
+    // getters e setters
 
     public LocalDate getData() {
         return data;
@@ -43,28 +48,36 @@ public class AgendamentoRequestDTO {
         this.horario = horario;
     }
 
-    public Long getClienteId() {
-        return clienteId;
+    public String getClienteNome() {
+        return clienteNome;
     }
 
-    public void setClienteId(Long clienteId) {
-        this.clienteId = clienteId;
+    public void setClienteNome(String clienteNome) {
+        this.clienteNome = clienteNome;
     }
 
-    public Long getServicoId() {
-        return servicoId;
+    public String getClienteTelefone() {
+        return clienteTelefone;
     }
 
-    public void setServicoId(Long servicoId) {
-        this.servicoId = servicoId;
+    public void setClienteTelefone(String clienteTelefone) {
+        this.clienteTelefone = clienteTelefone;
     }
 
-    public String getStatus() {
-        return status;
+    public String getServicoNome() {
+        return servicoNome;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setServicoNome(String servicoNome) {
+        this.servicoNome = servicoNome;
+    }
+
+    public String getProfissionalNome() {
+        return profissionalNome;
+    }
+
+    public void setProfissionalNome(String profissionalNome) {
+        this.profissionalNome = profissionalNome;
     }
 
     public String getObservacao() {
@@ -73,5 +86,13 @@ public class AgendamentoRequestDTO {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public Double getValorServico() {
+        return valorServico;
+    }
+
+    public void setValorServico(Double valorServico) {
+        this.valorServico = valorServico;
     }
 }

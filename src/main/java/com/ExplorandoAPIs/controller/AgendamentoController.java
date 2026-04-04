@@ -1,7 +1,9 @@
 package com.ExplorandoAPIs.controller;
 
+import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
 import com.ExplorandoAPIs.model.Agendamento;
 import com.ExplorandoAPIs.service.AgendamentoService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +19,30 @@ public class AgendamentoController {
         this.service = service;
     }
 
+    // Conversão DTO -> Entity
+    private Agendamento toEntity(AgendamentoRequestDTO dto) {
+
+        Agendamento agendamento = new Agendamento();
+
+        agendamento.setData(dto.getData());
+        agendamento.setHorario(dto.getHorario());
+        agendamento.setClienteNome(dto.getClienteNome());
+        agendamento.setClienteTelefone(dto.getClienteTelefone());
+        agendamento.setServicoNome(dto.getServicoNome());
+        agendamento.setProfissionalNome(dto.getProfissionalNome());
+        agendamento.setObservacao(dto.getObservacao());
+        agendamento.setValorServico(dto.getValorServico());
+
+        return agendamento;
+    }
+
     @PostMapping
-    public ResponseEntity<Agendamento> criar(@RequestBody Agendamento agendamento) {
+    public ResponseEntity<Agendamento> criar(
+            @Valid @RequestBody AgendamentoRequestDTO dto) {
+
+        Agendamento agendamento = toEntity(dto);
         Agendamento criado = service.criar(agendamento);
+
         return ResponseEntity.ok(criado);
     }
 
@@ -36,8 +59,9 @@ public class AgendamentoController {
     @PutMapping("/{id}")
     public ResponseEntity<Agendamento> atualizar(
             @PathVariable Long id,
-            @RequestBody Agendamento agendamento) {
+            @Valid @RequestBody AgendamentoRequestDTO dto) {
 
+        Agendamento agendamento = toEntity(dto);
         return ResponseEntity.ok(service.atualizar(id, agendamento));
     }
 
