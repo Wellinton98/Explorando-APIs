@@ -1,4 +1,4 @@
-package com.ExplorandoAPIs.integração;
+package com.ExplorandoAPIs.integraçao;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class AgendamentoControllerTests {
+class AgendamentoControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

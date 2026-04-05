@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
 
     Optional<Agendamento> findByDataAndHorario(LocalDate data, LocalTime horario);
+
+  
+    Optional<Agendamento> findByDataAndHorarioAndIdNot(LocalDate data, LocalTime horario, Long id);
 }

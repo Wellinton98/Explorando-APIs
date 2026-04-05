@@ -1,4 +1,4 @@
-package com.ExplorandoAPIs.unitario;
+package com.ExplorandoAPIs.unittest;
 
 public class AgendamentoControllerIntegrationTest {
     

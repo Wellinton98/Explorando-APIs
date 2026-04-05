@@ -22,7 +22,7 @@ public class AgendamentoService {
 
     public Agendamento criar(Agendamento agendamento) {
 
-        validarAgendamento(agendamento);
+        validarAgendamento(agendamento, null);
 
         agendamento.setStatus(StatusAgendamento.AGENDADO);
         agendamento.setCriadoEm(LocalDateTime.now());
@@ -44,7 +44,7 @@ public class AgendamentoService {
 
         Agendamento existente = buscarPorId(id);
 
-        validarAgendamento(novo);
+        validarAgendamento(novo, id); // 
 
         existente.setData(novo.getData());
         existente.setHorario(novo.getHorario());
@@ -87,7 +87,7 @@ public class AgendamentoService {
         repository.deleteById(id);
     }
 
-    private void validarAgendamento(Agendamento agendamento) {
+    private void validarAgendamento(Agendamento agendamento, Long idAtual) {
 
         LocalDate hoje = LocalDate.now();
         LocalDate limiteFuturo = hoje.plusYears(1);
@@ -116,9 +116,22 @@ public class AgendamentoService {
             throw new AgendamentoException("Horário fora do funcionamento (08:00 às 20:00)");
         }
 
-        repository.findByDataAndHorario(agendamento.getData(), agendamento.getHorario())
-                .ifPresent(a -> {
-                    throw new AgendamentoException("Horário já está ocupado");
-                });
+       
+        if (idAtual == null) {
+            // criação
+            repository.findByDataAndHorario(agendamento.getData(), agendamento.getHorario())
+                    .ifPresent(a -> {
+                        throw new AgendamentoException("Horário já está ocupado");
+                    });
+        } else {
+            // atualização
+            repository.findByDataAndHorarioAndIdNot(
+                    agendamento.getData(),
+                    agendamento.getHorario(),
+                    idAtual
+            ).ifPresent(a -> {
+                throw new AgendamentoException("Horário já está ocupado");
+            });
+        }
     }
 }
