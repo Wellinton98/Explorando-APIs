@@ -1,4 +1,4 @@
-package com.ExplorandoAPIs.integração;
+package com.ExplorandoAPIs.integracao;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)        
 class AgendamentoControllerIT {
 
     @Autowired
@@ -35,12 +36,12 @@ class AgendamentoControllerIT {
     private AgendamentoRequestDTO criarDTO() {
         AgendamentoRequestDTO dto = new AgendamentoRequestDTO();
         dto.setData(LocalDate.now().plusDays(1));
-        dto.setHorario(LocalTime.of(10, 0));
+        dto.setHorario(LocalTime.of(11, 0));
         dto.setClienteNome("Mateus");
         dto.setClienteTelefone("91-92859742");
         dto.setServicoNome("Corte");
         dto.setProfissionalNome("Wellinton");
-        dto.setObservacao("Teste integração");
+        dto.setObservacao("Corte de cabelo");
         dto.setValorServico(50.0);
         return dto;
     }
@@ -50,10 +51,10 @@ class AgendamentoControllerIT {
         var dto = criarDTO();
 
         mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("clienteNome").value("Wellinton"))
+                .andExpect(jsonPath("clienteNome").value("Mateus"))
                 .andExpect(jsonPath("status").value("AGENDADO"));
     }
 
@@ -68,8 +69,8 @@ class AgendamentoControllerIT {
         var dto = criarDTO();
 
         String response = mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -80,14 +81,15 @@ class AgendamentoControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(id));
     }
-
+  // erro ao atualizar, devido a validação de horário duplicado, o teste tenta atualizar para um horário já existente
+  // para corrigir, é necessário criar um novo DTO com um horário diferente para a atualização
     @Test
     void deveAtualizarAgendamento() throws Exception {
         var dto = criarDTO();
 
         String response = mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -97,8 +99,8 @@ class AgendamentoControllerIT {
         dto.setClienteNome("Maira");
 
         mockMvc.perform(put("/agendamentos/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("clienteNome").value("Maira"));
     }
@@ -108,8 +110,8 @@ class AgendamentoControllerIT {
         var dto = criarDTO();
 
         String response = mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -126,8 +128,8 @@ class AgendamentoControllerIT {
         var dto = criarDTO();
 
         String response = mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -144,8 +146,8 @@ class AgendamentoControllerIT {
         dto.setData(LocalDate.now().minusDays(1));
 
         mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -160,8 +162,8 @@ class AgendamentoControllerIT {
 
         // tenta duplicar
         mockMvc.perform(post("/agendamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
 }
