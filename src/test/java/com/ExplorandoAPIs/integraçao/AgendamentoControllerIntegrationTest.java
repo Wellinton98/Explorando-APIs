@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)        
 class AgendamentoControllerIT {
 
     @Autowired
@@ -32,7 +31,10 @@ class AgendamentoControllerIT {
 
     @Autowired
     private ObjectMapper objectMapper;
-
+        // comflito de horario, ele não permite criar ou atualizar para um horário já existente, 
+        //para corrigir, é necessário criar um novo DTO com um horário diferente para cada teste que envolva 
+        //criação ou atualização de agendamento
+        //
     private AgendamentoRequestDTO criarDTO() {
         AgendamentoRequestDTO dto = new AgendamentoRequestDTO();
         dto.setData(LocalDate.now().plusDays(1));
