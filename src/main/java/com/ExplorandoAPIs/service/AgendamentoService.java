@@ -25,12 +25,10 @@ public class AgendamentoService {
         this.restTemplate = restTemplate;
     }
 
-    // 🔥 NOVO MÉTODO COM DTO
     public Agendamento criar(AgendamentoRequestDTO dto) {
 
-      
-        //BUSCAR CLIENTE
-     
+        //MOCK CLIENTE (TEMPORÁRIO)
+        /*
         String urlCliente = "https://api-clientes.com/clientes/" + dto.getClienteId();
 
         Map<String, Object> cliente =
@@ -39,10 +37,15 @@ public class AgendamentoService {
         if (cliente == null) {
             throw new AgendamentoException("Cliente não encontrado");
         }
+        */
 
-       
-        //BUSCAR SERVIÇO
-      
+        Map<String, Object> cliente = Map.of(
+                "nome", "Cliente Teste",
+                "telefone", "999999999"
+        );
+
+        // MOCK SERVIÇO (TEMPORÁRIO)
+        /*
         String urlServico = "https://api-servicos.com/servicos/" + dto.getServicoId();
 
         Map<String, Object> servico =
@@ -51,16 +54,20 @@ public class AgendamentoService {
         if (servico == null) {
             throw new AgendamentoException("Serviço não encontrado");
         }
+        */
 
-      
+        Map<String, Object> servico = Map.of(
+                "descricao", "Corte de cabelo",
+                "valor", 50.0
+        );
+
         //MONTAR AGENDAMENTO
-       
+
         Agendamento agendamento = new Agendamento();
 
         agendamento.setData(dto.getData());
         agendamento.setHorario(dto.getHorario());
 
-        // vindo da API externa
         agendamento.setClienteNome((String) cliente.get("nome"));
         agendamento.setClienteTelefone((String) cliente.get("telefone"));
 
@@ -69,13 +76,11 @@ public class AgendamentoService {
                 Double.valueOf(servico.get("valor").toString())
         );
 
-        // vindo do DTO
         agendamento.setProfissionalNome(dto.getProfissionalNome());
         agendamento.setObservacao(dto.getObservacao());
 
-        
-        //SUA VALIDAÇÃO ORIGINAL
-       
+        // SUA VALIDAÇÃO ORIGINAL
+
         validarAgendamento(agendamento, null);
 
         agendamento.setStatus(StatusAgendamento.AGENDADO);
@@ -127,6 +132,25 @@ public class AgendamentoService {
         }
 
         agendamento.setStatus(StatusAgendamento.CANCELADO);
+        agendamento.setAtualizadoEm(LocalDateTime.now());
+
+        return repository.save(agendamento);
+    }
+
+    // 🔥 NOVO MÉTODO CONCLUIR
+    public Agendamento concluir(Long id) {
+
+        Agendamento agendamento = buscarPorId(id);
+
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+            throw new AgendamentoException("Não é possível concluir um agendamento cancelado");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.CONCLUIDO) {
+            throw new AgendamentoException("Agendamento já está concluído");
+        }
+
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
         agendamento.setAtualizadoEm(LocalDateTime.now());
 
         return repository.save(agendamento);

@@ -35,13 +35,13 @@ public class AgendamentoController {
 
         return agendamento;
     }
+
     @PostMapping
     public ResponseEntity<Agendamento> criar(
-        @Valid @RequestBody AgendamentoRequestDTO dto) {
+            @Valid @RequestBody AgendamentoRequestDTO dto) {
 
-    Agendamento criado = service.criar(dto);
-
-    return ResponseEntity.ok(criado);
+        Agendamento criado = service.criar(dto);
+        return ResponseEntity.ok(criado);
     }
 
     @GetMapping
@@ -72,5 +72,11 @@ public class AgendamentoController {
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<Agendamento> cancelar(@PathVariable Long id) {
         return ResponseEntity.ok(service.cancelar(id));
+    }
+
+    // NOVO MÉTODO
+    @PatchMapping("/{id}/concluir")
+    public ResponseEntity<Agendamento> concluir(@PathVariable Long id) {
+        return ResponseEntity.ok(service.concluir(id));
     }
 }
