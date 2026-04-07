@@ -1,27 +1,81 @@
 package com.ExplorandoAPIs.service;
 
+import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
 import com.ExplorandoAPIs.exception.AgendamentoException;
 import com.ExplorandoAPIs.model.Agendamento;
 import com.ExplorandoAPIs.model.StatusAgendamento;
 import com.ExplorandoAPIs.repository.AgendamentoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AgendamentoService {
 
     private final AgendamentoRepository repository;
+    private final RestTemplate restTemplate;
 
-    public AgendamentoService(AgendamentoRepository repository) {
+    public AgendamentoService(AgendamentoRepository repository, RestTemplate restTemplate) {
         this.repository = repository;
+        this.restTemplate = restTemplate;
     }
 
-    public Agendamento criar(Agendamento agendamento) {
+    // 🔥 NOVO MÉTODO COM DTO
+    public Agendamento criar(AgendamentoRequestDTO dto) {
 
+      
+        //BUSCAR CLIENTE
+     
+        String urlCliente = "https://api-clientes.com/clientes/" + dto.getClienteId();
+
+        Map<String, Object> cliente =
+                restTemplate.getForObject(urlCliente, Map.class);
+
+        if (cliente == null) {
+            throw new AgendamentoException("Cliente não encontrado");
+        }
+
+       
+        //BUSCAR SERVIÇO
+      
+        String urlServico = "https://api-servicos.com/servicos/" + dto.getServicoId();
+
+        Map<String, Object> servico =
+                restTemplate.getForObject(urlServico, Map.class);
+
+        if (servico == null) {
+            throw new AgendamentoException("Serviço não encontrado");
+        }
+
+      
+        //MONTAR AGENDAMENTO
+       
+        Agendamento agendamento = new Agendamento();
+
+        agendamento.setData(dto.getData());
+        agendamento.setHorario(dto.getHorario());
+
+        // vindo da API externa
+        agendamento.setClienteNome((String) cliente.get("nome"));
+        agendamento.setClienteTelefone((String) cliente.get("telefone"));
+
+        agendamento.setServicoNome((String) servico.get("descricao"));
+        agendamento.setValorServico(
+                Double.valueOf(servico.get("valor").toString())
+        );
+
+        // vindo do DTO
+        agendamento.setProfissionalNome(dto.getProfissionalNome());
+        agendamento.setObservacao(dto.getObservacao());
+
+        
+        //SUA VALIDAÇÃO ORIGINAL
+       
         validarAgendamento(agendamento, null);
 
         agendamento.setStatus(StatusAgendamento.AGENDADO);
@@ -44,7 +98,7 @@ public class AgendamentoService {
 
         Agendamento existente = buscarPorId(id);
 
-        validarAgendamento(novo, id); // 
+        validarAgendamento(novo, id);
 
         existente.setData(novo.getData());
         existente.setHorario(novo.getHorario());
@@ -116,15 +170,12 @@ public class AgendamentoService {
             throw new AgendamentoException("Horário fora do funcionamento (08:00 às 20:00)");
         }
 
-       
         if (idAtual == null) {
-            // criação
             repository.findByDataAndHorario(agendamento.getData(), agendamento.getHorario())
                     .ifPresent(a -> {
                         throw new AgendamentoException("Horário já está ocupado");
                     });
         } else {
-            // atualização
             repository.findByDataAndHorarioAndIdNot(
                     agendamento.getData(),
                     agendamento.getHorario(),

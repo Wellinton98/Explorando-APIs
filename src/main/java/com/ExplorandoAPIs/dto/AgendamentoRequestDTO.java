@@ -30,6 +30,12 @@ public class AgendamentoRequestDTO {
     @Positive(message = "Valor deve ser maior que zero")
     private Double valorServico;
 
+    @NotNull(message = "ID do cliente é obrigatório")
+    private Long clienteId;
+
+    @NotNull(message = "ID do serviço é obrigatório")
+    private Long servicoId;
+
     // getters e setters
 
     public LocalDate getData() {
@@ -95,4 +101,19 @@ public class AgendamentoRequestDTO {
     public void setValorServico(Double valorServico) {
         this.valorServico = valorServico;
     }
+    public Long getClienteId() {
+    return clienteId;
+    }
+
+    public void setClienteId(Long clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public Long getServicoId() {
+        return servicoId;
+    }
+
+    public void setServicoId(Long servicoId) {
+        this.servicoId = servicoId;
+}
 }

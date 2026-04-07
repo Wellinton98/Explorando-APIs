@@ -35,15 +35,13 @@ public class AgendamentoController {
 
         return agendamento;
     }
-
     @PostMapping
     public ResponseEntity<Agendamento> criar(
-            @Valid @RequestBody AgendamentoRequestDTO dto) {
+        @Valid @RequestBody AgendamentoRequestDTO dto) {
 
-        Agendamento agendamento = toEntity(dto);
-        Agendamento criado = service.criar(agendamento);
+    Agendamento criado = service.criar(dto);
 
-        return ResponseEntity.ok(criado);
+    return ResponseEntity.ok(criado);
     }
 
     @GetMapping
