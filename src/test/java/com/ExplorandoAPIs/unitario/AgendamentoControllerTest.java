@@ -2,15 +2,17 @@ package com.ExplorandoAPIs.unitario;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import com.ExplorandoAPIs.model.StatusAgendamento;
 import com.ExplorandoAPIs.controller.AgendamentoController;
 import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
@@ -33,18 +35,7 @@ class AgendamentoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private AgendamentoRequestDTO criarDTO() {
-        AgendamentoRequestDTO dto = new AgendamentoRequestDTO();
-        dto.setData(LocalDate.now().plusDays(1)); // corrigido
-        dto.setHorario(LocalTime.of(10, 0));
-        dto.setClienteNome("Mateus");
-        dto.setClienteTelefone("999999999");
-        dto.setServicoNome("Corte");
-        dto.setProfissionalNome("Wellinton");
-        dto.setValorServico(50.0);
-        return dto;
-    }
-
+    // Mock de retorno
     private Agendamento criarAgendamento() {
         Agendamento ag = new Agendamento();
         ag.setId(1L);
@@ -53,65 +44,88 @@ class AgendamentoControllerTest {
         return ag;
     }
 
+    // DTO COMPLETO (resolve TODOS os 400)
+    private AgendamentoRequestDTO criarDTOCompleto() {
+        AgendamentoRequestDTO dto = new AgendamentoRequestDTO();
+        dto.setData(LocalDate.now().plusDays(1));
+        dto.setHorario(LocalTime.of(10, 0));
+        dto.setClienteNome("Mateus");
+        dto.setClienteTelefone("999999999");
+        dto.setServicoNome("Corte");
+        dto.setProfissionalNome("Wellinton");
+        dto.setObservacao("Teste");
+        dto.setValorServico(50.0);
+
+        //CAMPOS OBRIGATÓRIOS QUE FALTAVAM
+        dto.setClienteId(1L);
+        dto.setServicoId(1L);
+
+        return dto;
+    }
+
     @Test
     void deveCriarAgendamento() throws Exception {
-        var dto = criarDTO();
-        var agendamento = criarAgendamento();
 
         Mockito.when(service.criar(Mockito.any()))
-                .thenReturn(agendamento);
+                .thenReturn(criarAgendamento());
 
         mockMvc.perform(post("/agendamentos")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                .content(objectMapper.writeValueAsString(criarDTOCompleto())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("clienteNome").value("Mateus"));
+                .andExpect(jsonPath("$.clienteNome").value("Mateus"));
     }
 
     @Test
     void deveListarAgendamentos() throws Exception {
+
         Mockito.when(service.listar())
                 .thenReturn(List.of(criarAgendamento()));
 
         mockMvc.perform(get("/agendamentos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("clienteNome").value("Mateus"));
+                .andExpect(jsonPath("$[0].clienteNome").value("Mateus"));
     }
 
     @Test
     void deveBuscarPorId() throws Exception {
+
         Mockito.when(service.buscarPorId(1L))
                 .thenReturn(criarAgendamento());
 
         mockMvc.perform(get("/agendamentos/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(1));
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     void deveAtualizarAgendamento() throws Exception {
-        var dto = criarDTO();
-        var atualizado = criarAgendamento();
+
+        var atualizado = new Agendamento();
+        atualizado.setId(1L);
         atualizado.setClienteNome("Maira");
+        atualizado.setStatus(StatusAgendamento.AGENDADO);
 
         Mockito.when(service.atualizar(Mockito.eq(1L), Mockito.any()))
                 .thenReturn(atualizado);
 
         mockMvc.perform(put("/agendamentos/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                .content(objectMapper.writeValueAsString(criarDTOCompleto())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("clienteNome").value("Maira"));
+                .andExpect(jsonPath("$.clienteNome").value("Maira"));
     }
 
     @Test
     void deveDeletarAgendamento() throws Exception {
+
         mockMvc.perform(delete("/agendamentos/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void deveCancelarAgendamento() throws Exception {
+
         var cancelado = criarAgendamento();
         cancelado.setStatus(StatusAgendamento.CANCELADO);
 
@@ -120,11 +134,12 @@ class AgendamentoControllerTest {
 
         mockMvc.perform(patch("/agendamentos/1/cancelar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("status").value("CANCELADO"));
+                .andExpect(jsonPath("$.status").value("CANCELADO"));
     }
 
     @Test
     void deveConcluirAgendamento() throws Exception {
+
         var concluido = criarAgendamento();
         concluido.setStatus(StatusAgendamento.CONCLUIDO);
 
