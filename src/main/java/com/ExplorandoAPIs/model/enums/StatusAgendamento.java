@@ -1,4 +1,4 @@
-package com.ExplorandoAPIs.model;
+package com.ExplorandoAPIs.model.enums;
 
 public enum StatusAgendamento {
     AGENDADO,

@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.ExplorandoAPIs.model.enums.StatusAgendamento;
+
 @Entity
 public class Agendamento {
 
@@ -34,6 +36,8 @@ public class Agendamento {
     private LocalDateTime criadoEm;
 
     private LocalDateTime atualizadoEm;
+
+    public Agendamento() {}
 
     // GETTERS E SETTERS
 

@@ -3,7 +3,7 @@ package com.ExplorandoAPIs.service;
 import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
 import com.ExplorandoAPIs.exception.AgendamentoException;
 import com.ExplorandoAPIs.model.Agendamento;
-import com.ExplorandoAPIs.model.StatusAgendamento;
+import com.ExplorandoAPIs.model.enums.StatusAgendamento;
 import com.ExplorandoAPIs.repository.AgendamentoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

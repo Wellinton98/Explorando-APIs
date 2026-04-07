@@ -13,10 +13,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.ExplorandoAPIs.model.StatusAgendamento;
 import com.ExplorandoAPIs.controller.AgendamentoController;
 import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
 import com.ExplorandoAPIs.model.Agendamento;
+import com.ExplorandoAPIs.model.enums.StatusAgendamento;
 import com.ExplorandoAPIs.service.AgendamentoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
