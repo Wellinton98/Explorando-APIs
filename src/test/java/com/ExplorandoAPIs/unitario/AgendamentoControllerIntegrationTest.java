@@ -5,13 +5,13 @@ import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
+import com.ExplorandoAPIs.model.StatusAgendamento;
 import com.ExplorandoAPIs.controller.AgendamentoController;
 import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
 import com.ExplorandoAPIs.model.Agendamento;
@@ -47,9 +47,9 @@ class AgendamentoControllerTest {
 
     private Agendamento criarAgendamento() {
         Agendamento ag = new Agendamento();
-        ag.setId(1L); // corrigido (L maiúsculo)
+        ag.setId(1L);
         ag.setClienteNome("Mateus");
-        ag.setStatus("AGENDADO"); // ajuste se for enum
+        ag.setStatus(StatusAgendamento.AGENDADO);
         return ag;
     }
 
@@ -65,7 +65,7 @@ class AgendamentoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.clienteNome").value("Mateus"));
+                .andExpect(jsonPath("clienteNome").value("Mateus"));
     }
 
     @Test
@@ -75,7 +75,7 @@ class AgendamentoControllerTest {
 
         mockMvc.perform(get("/agendamentos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].clienteNome").value("Mateus"));
+                .andExpect(jsonPath("clienteNome").value("Mateus"));
     }
 
     @Test
@@ -85,14 +85,14 @@ class AgendamentoControllerTest {
 
         mockMvc.perform(get("/agendamentos/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("id").value(1));
     }
 
     @Test
     void deveAtualizarAgendamento() throws Exception {
         var dto = criarDTO();
         var atualizado = criarAgendamento();
-        atualizado.setClienteNome("Maria");
+        atualizado.setClienteNome("Maira");
 
         Mockito.when(service.atualizar(Mockito.eq(1L), Mockito.any()))
                 .thenReturn(atualizado);
@@ -101,7 +101,7 @@ class AgendamentoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.clienteNome").value("Maria"));
+                .andExpect(jsonPath("clienteNome").value("Maira"));
     }
 
     @Test
@@ -113,20 +113,20 @@ class AgendamentoControllerTest {
     @Test
     void deveCancelarAgendamento() throws Exception {
         var cancelado = criarAgendamento();
-        cancelado.setStatus("CANCELADO");
+        cancelado.setStatus(StatusAgendamento.CANCELADO);
 
         Mockito.when(service.cancelar(1L))
                 .thenReturn(cancelado);
 
         mockMvc.perform(patch("/agendamentos/1/cancelar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CANCELADO"));
+                .andExpect(jsonPath("status").value("CANCELADO"));
     }
 
     @Test
     void deveConcluirAgendamento() throws Exception {
         var concluido = criarAgendamento();
-        concluido.setStatus("CONCLUIDO");
+        concluido.setStatus(StatusAgendamento.CONCLUIDO);
 
         Mockito.when(service.concluir(1L))
                 .thenReturn(concluido);
