@@ -137,7 +137,7 @@ public class AgendamentoService {
         return repository.save(agendamento);
     }
 
-    // 🔥 NOVO MÉTODO CONCLUIR
+    // NOVO MÉTODO CONCLUIR
     public Agendamento concluir(Long id) {
 
         Agendamento agendamento = buscarPorId(id);
