@@ -1,11 +1,17 @@
 package com.ExplorandoAPIs.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.ExplorandoAPIs.model.enums.StatusAgendamento;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Agendamento {
@@ -36,8 +42,6 @@ public class Agendamento {
     private LocalDateTime criadoEm;
 
     private LocalDateTime atualizadoEm;
-
-    public Agendamento() {}
 
     // GETTERS E SETTERS
 
@@ -135,5 +139,10 @@ public class Agendamento {
 
     public void setAtualizadoEm(LocalDateTime atualizadoEm) {
         this.atualizadoEm = atualizadoEm;
+    }
+
+    public void setDescricao(Object descricao) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setDescricao'");
     }
 }

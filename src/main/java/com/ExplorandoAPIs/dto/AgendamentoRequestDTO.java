@@ -1,8 +1,11 @@
 package com.ExplorandoAPIs.dto;
 
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class AgendamentoRequestDTO {
 

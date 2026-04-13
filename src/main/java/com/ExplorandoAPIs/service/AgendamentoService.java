@@ -1,18 +1,21 @@
-package com.ExplorandoAPIs.service;
 
-import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
-import com.ExplorandoAPIs.exception.AgendamentoException;
-import com.ExplorandoAPIs.model.Agendamento;
-import com.ExplorandoAPIs.model.enums.StatusAgendamento;
-import com.ExplorandoAPIs.repository.AgendamentoRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+package com.ExplorandoAPIs.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
+import com.ExplorandoAPIs.dto.AgendamentoUpdateDTO;
+import com.ExplorandoAPIs.exception.AgendamentoException;
+import com.ExplorandoAPIs.model.Agendamento;
+import com.ExplorandoAPIs.model.enums.StatusAgendamento;
+import com.ExplorandoAPIs.repository.AgendamentoRepository;
 
 @Service
 public class AgendamentoService {
@@ -98,26 +101,50 @@ public class AgendamentoService {
         return repository.findById(id)
                 .orElseThrow(() -> new AgendamentoException("Agendamento não encontrado"));
     }
+    
+    public Agendamento atualizar(Long id, AgendamentoUpdateDTO dto) {
 
-    public Agendamento atualizar(Long id, Agendamento novo) {
+        Agendamento agendamento = buscarPorId(id);
 
-        Agendamento existente = buscarPorId(id);
+        if (dto.getData() != null) {
+            agendamento.setData(dto.getData());
+        }
 
-        validarAgendamento(novo, id);
+        if (dto.getHorario() != null) {
+            agendamento.setHorario(dto.getHorario());
+        }
 
-        existente.setData(novo.getData());
-        existente.setHorario(novo.getHorario());
-        existente.setClienteNome(novo.getClienteNome());
-        existente.setClienteTelefone(novo.getClienteTelefone());
-        existente.setServicoNome(novo.getServicoNome());
-        existente.setProfissionalNome(novo.getProfissionalNome());
-        existente.setObservacao(novo.getObservacao());
-        existente.setValorServico(novo.getValorServico());
+        if (dto.getClienteNome() != null) {
+            agendamento.setClienteNome(dto.getClienteNome());
+        }
 
-        existente.setAtualizadoEm(LocalDateTime.now());
+        if (dto.getClienteTelefone() != null) {
+            agendamento.setClienteTelefone(dto.getClienteTelefone());
+        }
 
-        return repository.save(existente);
+        if (dto.getServicoNome() != null) {
+            agendamento.setServicoNome(dto.getServicoNome());
+        }
+
+        if (dto.getProfissionalNome() != null) {
+            agendamento.setProfissionalNome(dto.getProfissionalNome());
+        }
+
+        if (dto.getObservacao() != null) {
+            agendamento.setObservacao(dto.getObservacao());
+        }
+
+        if (dto.getValorServico() != null) {
+            agendamento.setValorServico(dto.getValorServico());
+        }
+
+        validarAgendamento(agendamento, id);
+
+        agendamento.setAtualizadoEm(LocalDateTime.now());
+
+        return repository.save(agendamento);
     }
+    
 
     public Agendamento cancelar(Long id) {
 
@@ -137,7 +164,7 @@ public class AgendamentoService {
         return repository.save(agendamento);
     }
 
-    // NOVO MÉTODO CONCLUIR
+    // 🔥 NOVO MÉTODO CONCLUIR
     public Agendamento concluir(Long id) {
 
         Agendamento agendamento = buscarPorId(id);
@@ -209,4 +236,6 @@ public class AgendamentoService {
             });
         }
     }
+
+    
 }

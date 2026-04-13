@@ -1,13 +1,25 @@
 package com.ExplorandoAPIs.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ExplorandoAPIs.dto.AgendamentoRequestDTO;
+import com.ExplorandoAPIs.dto.AgendamentoResponseDTO;
+import com.ExplorandoAPIs.dto.AgendamentoUpdateDTO;
 import com.ExplorandoAPIs.model.Agendamento;
 import com.ExplorandoAPIs.service.AgendamentoService;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/agendamentos")
@@ -54,14 +66,22 @@ public class AgendamentoController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Agendamento> atualizar(
+  @PutMapping("/{id}")
+    public ResponseEntity<AgendamentoResponseDTO> atualizar(
             @PathVariable Long id,
-            @Valid @RequestBody AgendamentoRequestDTO dto) {
+            @Valid @RequestBody AgendamentoUpdateDTO dto) {
 
-        Agendamento agendamento = toEntity(dto);
-        return ResponseEntity.ok(service.atualizar(id, agendamento));
+        Agendamento atualizado = service.atualizar(id, dto);
+        return ResponseEntity.ok(toResponseDTO(atualizado));
     }
+
+    // Conversão Entity -> DTO de resposta
+    private AgendamentoResponseDTO toResponseDTO(Agendamento agendamento) {
+        return new AgendamentoResponseDTO(
+        );
+    }
+
+   
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
