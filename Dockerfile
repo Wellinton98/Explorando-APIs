@@ -1,7 +1,7 @@
 # Etapa 1 - build
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY
+COPY . .
 RUN mvn clean package -DskipTests
 
 # Etapa 2 - execução
