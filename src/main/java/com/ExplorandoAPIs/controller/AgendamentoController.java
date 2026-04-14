@@ -31,6 +31,11 @@ public class AgendamentoController {
     public AgendamentoController(AgendamentoService service) {
         this.service = service;
     }
+        @GetMapping("/")
+    public String home() {
+        return "API de Agendamentos está rodando 🚀";
+    
+    }
 
     // Conversão DTO -> Entity
     private Agendamento toEntity(AgendamentoRequestDTO dto) {
